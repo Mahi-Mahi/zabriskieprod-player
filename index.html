@@ -26,8 +26,6 @@
 
 			var $video = document.getElementById('video');
 
-			console.log($video);
-
 			var cuepoints = [];
 			jQuery.getJSON('conf.json', function(data) {
 
@@ -37,7 +35,6 @@
 				jQuery('.chapitres').append(cuepoints.join(''));
 				jQuery('.chapitres a').on('click', function(){
 					time = Math.round(parseInt(jQuery(this).data('cue'), 10) / 1000);
-					console.log(time);
 					$video.currentTime = time;
 				});
 
@@ -49,8 +46,6 @@
 
 	<ul class="chapitres">
 	</ul>
-
-	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
 
 </body>
 </html>
