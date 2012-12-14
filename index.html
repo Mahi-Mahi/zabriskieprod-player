@@ -1,0 +1,56 @@
+<html>
+<head>
+	<title>Zabriskieprod-player</title>
+	 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	 <style type="text/css">
+	 .chapitres {
+	 	list-style: none;
+	 }
+	 .chapitres li {
+	 	float: left;
+	 	margin-right: 5px;
+	 }
+	 </style>
+</head>
+<body>
+
+	<video id="video" width="768" height="511" controls autoplay preload="metadata" >
+		<source type="video/mp4" src="http://d1td3oskkcu6vh.cloudfront.net/video.mp4" />
+		<source type="video/ogg" src="http://d1td3oskkcu6vh.cloudfront.net/video.ogg" />
+		<source type="video/webm" src="http://d1td3oskkcu6vh.cloudfront.net/video.webm" />
+	</video>
+
+	<script type="text/javascript">
+
+		jQuery(function(){
+
+			var $video = document.getElementById('video');
+
+			console.log($video);
+
+			var cuepoints = [];
+			jQuery.getJSON('conf.json', function(data) {
+
+				jQuery.each(data.FLVCoreCuePoints.CuePoint, function(key, val){
+					cuepoints.push('<li><a href="#" data-cue="'+val.Time+'">'+(key+1)+'</a></li>');
+				});
+				jQuery('.chapitres').append(cuepoints.join(''));
+				jQuery('.chapitres a').on('click', function(){
+					time = Math.round(parseInt(jQuery(this).data('cue'), 10) / 1000);
+					console.log(time);
+					$video.currentTime = time;
+				});
+
+			});
+
+		});
+
+	</script>
+
+	<ul class="chapitres">
+	</ul>
+
+	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
+
+</body>
+</html>
