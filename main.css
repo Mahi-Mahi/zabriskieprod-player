@@ -1,0 +1,21 @@
+.timeline {
+	list-style: none;
+	display: block;
+	clear: both;
+}
+.timeline li {
+	float: left;
+	margin-right: 5px;
+}
+
+.chapters {
+	list-style: none;
+	display: block;
+	clear: both;
+}
+.chapters li  {
+	padding: 2px;
+}
+.chapters li:hover {
+	background-color:yellow;
+}
