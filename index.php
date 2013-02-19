@@ -25,6 +25,25 @@
 
 	$chapters = json_decode(file_get_contents($json))->FLVCoreCuePoints->CuePoint;
 
+	foreach($chapters as $i => $chapter):
+		$idx = $i + 1;
+
+		$thumb = constant('THUMBS_URL') . '/' . $video_id . '/thumbs/' . $idx . '.png';
+		$big_thumb = constant('THUMBS_URL') . '/' . $video_id . '/thumbs/' . $idx . '-big.png';
+
+		if ( ! is_file($_SERVER['DOCUMENT_ROOT'] . $thumb) ) :
+			@mkdir(dirname($_SERVER['DOCUMENT_ROOT'] . $thumb), 0755, true);
+			print $_SERVER['DOCUMENT_ROOT'] . $thumb;
+			file_put_contents($_SERVER['DOCUMENT_ROOT'] . $thumb, file_get_contents('http://placehold.it/54x36.png&text='.$idx) );
+		endif;
+
+		if ( ! is_file($_SERVER['DOCUMENT_ROOT'] . $big_thumb) ) :
+			@mkdir(dirname($_SERVER['DOCUMENT_ROOT'] . $big_thumb), 0755, true);
+			print $_SERVER['DOCUMENT_ROOT'] . $big_thumb;
+			file_put_contents($_SERVER['DOCUMENT_ROOT'] . $big_thumb, file_get_contents('http://placehold.it/200x180.png&text='.$idx) );
+		endif;
+	endforeach;
+
 	?>
 
 	<script type="text/javascript">
@@ -67,9 +86,11 @@
 
 							foreach($items as $i => $chapter):
 								$idx = $i + 1;
+								$thumb = constant('THUMBS_URL') . '/' . $video_id . '/thumbs/' . $idx . '.png';
 								?>
 								<li>
 									<a data-cue="<?php print $chapter->Time ?>" data-chapter="<?php print $idx ?>">
+										<img src="<?php print $thumb ?>">
 										&nbsp;
 									</a>
 								</li>
@@ -86,24 +107,10 @@
 								$idx = $i + 1;
 
 								$thumb = constant('THUMBS_URL') . '/' . $video_id . '/thumbs/' . $idx . '.png';
-								$big_thumb = constant('THUMBS_URL') . '/' . $video_id . '/thumbs/' . $idx . '-big.png';
-
-								if ( ! is_file($_SERVER['DOCUMENT_ROOT'] . $thumb) ) :
-									@mkdir(dirname($_SERVER['DOCUMENT_ROOT'] . $thumb), 0755, true);
-									print $_SERVER['DOCUMENT_ROOT'] . $thumb;
-									file_put_contents($_SERVER['DOCUMENT_ROOT'] . $thumb, file_get_contents('http://placehold.it/54x36.png&text='.$idx) );
-								endif;
-
-								if ( ! is_file($_SERVER['DOCUMENT_ROOT'] . $big_thumb) ) :
-									@mkdir(dirname($_SERVER['DOCUMENT_ROOT'] . $big_thumb), 0755, true);
-									print $_SERVER['DOCUMENT_ROOT'] . $big_thumb;
-									file_put_contents($_SERVER['DOCUMENT_ROOT'] . $big_thumb, file_get_contents('http://placehold.it/54x36.png&text='.$idx) );
-								endif;
-
 
 								?>
 								<li>
-									<a data-cue="<?php print $chapter->Time ?>">
+									<a data-cue="<?php print $chapter->Time ?>" data-chapter="<?php print $idx ?>">
 										<img src="<?php print $thumb ?>">
 									</a>
 								</li>
@@ -126,6 +133,12 @@
 				</div>
 			</div>
 		</footer>
+
+		<div class="tooltip">
+			<img src="" width="200" height="120">
+			<span>XXxXXXX</span>
+		</div>
+		<div class="arrow"></div>
 
 	<script type="text/javascript" src="/main.js" />
 
