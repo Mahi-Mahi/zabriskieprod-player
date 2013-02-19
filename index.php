@@ -1,12 +1,12 @@
 <html>
 <head>
 	<title>Zabriskieprod-player</title>
-	 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-	 <link rel="stylesheet" type="text/css" href="/main.css">
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Signika+Negative' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" href="/main.css">
 </head>
 <body>
 
-	<xmp>
 	<?php
 	define('VIDEO_URL', 'http://d1td3oskkcu6vh.cloudfront.net');
 	// define('JSON_URL', 'http://d1td3oskkcu6vh.cloudfront.net');
@@ -14,6 +14,8 @@
 	define('JSON_URL', '/videos');
 	define('THUMBS_URL', '/videos');
 	$video_id = "test";
+	$video_title = "Introduction à la Chimiothérapie";
+	$video_author = "Jean-Yves-Alexander Blay-Eggemont";
 
 	$json = $_SERVER['DOCUMENT_ROOT'] . constant('JSON_URL') . '/' . $video_id . '/conf.json';
 
@@ -23,10 +25,7 @@
 
 	$chapters = json_decode(file_get_contents($json))->FLVCoreCuePoints->CuePoint;
 
-//	print_r($chapters->FLVCoreCuePoints->CuePoint);
-
 	?>
-	</xmp>
 
 	<script type="text/javascript">
 		var video_id = '<?php print $video_id ?>';
@@ -35,72 +34,100 @@
 		var thumbs_url = '<?php print constant('THUMBS_URL') ?>';
 	</script>
 
-	<video id="video" width="768" height="385" controls autoplay preload="metadata" >
-		<source type="video/mp4" src="<?php print constant('VIDEO_URL') ?>/<?php print $video_id ?>/video.mp4" />
-		<source type="video/ogg" src="<?php print constant('VIDEO_URL') ?>/<?php print $video_id ?>/video.ogg" />
-		<source type="video/webm" src="<?php print constant('VIDEO_URL') ?>/<?php print $video_id ?>/video.webm" />
-	</video>
+		<header>
+			<div class="inner">
+				<h1>
+					<?php print $video_title ?>
+				</h1>
+				<div class="author">
+					<div>Par <?php print $video_author ?></div>
+				</div>
+			</div>
+		</header>
+		<div class="content">
+			<div class="inner">
 
-	<ul class="timeline">
-		<?php
-		foreach($chapters as $i => $chapter):
-			$idx = $i + 1;
-			?>
-			<li>
-				<a data-cue="<?php print $chapter->Time ?>">
-					<?php print $idx ?>
-				</a>
-			</li>
-			<?php
-		endforeach;
-		?>
-	</ul>
+				<video id="video" width="960" height="480" controls autoplay preload="metadata" >
+					<source type="video/mp4" src="<?php print constant('VIDEO_URL') ?>/<?php print $video_id ?>/video.mp4" />
+					<source type="video/ogg" src="<?php print constant('VIDEO_URL') ?>/<?php print $video_id ?>/video.ogg" />
+					<source type="video/webm" src="<?php print constant('VIDEO_URL') ?>/<?php print $video_id ?>/video.webm" />
+				</video>
 
-	<ul class="timeline chapters">
-		<?php
-		foreach($chapters as $i => $chapter):
-			$idx = $i + 1;
+				<div class="control">
 
-			$thumb = constant('THUMBS_URL') . '/' . $video_id . '/thumbs/' . $idx . '.png';
+					<div class="outer">
+						<ul class="timeline">
+							<?php
+							$items = array();
+							foreach($chapters as $i => $chapter):
+								$items[$i] = $chapter;
+								if ( isset($items[$i - 1]) )
+									$items[$i - 1]->Duration = $chapter->Time;
+							endforeach;
 
-			if ( ! is_file($_SERVER['DOCUMENT_ROOT'] . $thumb) ) :
-				print $_SERVER['DOCUMENT_ROOT'] . $thumb;
-				file_put_contents($_SERVER['DOCUMENT_ROOT'] . constant('THUMBS_URL') . '/' . $video_id . '/thumbs/' . $idx . '.png', file_get_contents('http://placehold.it/54x36.png&text='.$idx) );
-			endif;
+							foreach($items as $i => $chapter):
+								$idx = $i + 1;
+								?>
+								<li>
+									<a data-cue="<?php print $chapter->Time ?>" data-chapter="<?php print $idx ?>">
+										&nbsp;
+									</a>
+								</li>
+								<?php
+							endforeach;
+							?>
+						</ul>
+					</div>
 
-			?>
-			<li>
-				<a href="#" data-cue="<?php print $chapter->Time ?>">
-					<img src="<?php print $thumb ?>">
-				</a>
-			</li>
-			<?php
-		endforeach;
-		?>
-	</ul>
+					<div class="outer">
+						<ul class="chapters">
+							<?php
+							foreach($chapters as $i => $chapter):
+								$idx = $i + 1;
 
-	<script type="text/javascript">
+								$thumb = constant('THUMBS_URL') . '/' . $video_id . '/thumbs/' . $idx . '.png';
+								$big_thumb = constant('THUMBS_URL') . '/' . $video_id . '/thumbs/' . $idx . '-big.png';
 
-		jQuery(function(){
+								if ( ! is_file($_SERVER['DOCUMENT_ROOT'] . $thumb) ) :
+									@mkdir(dirname($_SERVER['DOCUMENT_ROOT'] . $thumb), 0755, true);
+									print $_SERVER['DOCUMENT_ROOT'] . $thumb;
+									file_put_contents($_SERVER['DOCUMENT_ROOT'] . $thumb, file_get_contents('http://placehold.it/54x36.png&text='.$idx) );
+								endif;
 
-			var $video = document.getElementById('video');
+								if ( ! is_file($_SERVER['DOCUMENT_ROOT'] . $big_thumb) ) :
+									@mkdir(dirname($_SERVER['DOCUMENT_ROOT'] . $big_thumb), 0755, true);
+									print $_SERVER['DOCUMENT_ROOT'] . $big_thumb;
+									file_put_contents($_SERVER['DOCUMENT_ROOT'] . $big_thumb, file_get_contents('http://placehold.it/54x36.png&text='.$idx) );
+								endif;
 
-			jQuery.getJSON( json_url + '/' + video_id + '/conf.json', function(data) {
 
-				jQuery('.timeline li').on('click', function(){
-					time = Math.round(parseInt(jQuery(this).data('cue'), 10) / 1000);
-					$video.currentTime = time;
-					console.log(time);
-				});
+								?>
+								<li>
+									<a data-cue="<?php print $chapter->Time ?>">
+										<img src="<?php print $thumb ?>">
+									</a>
+								</li>
+								<?php
+							endforeach;
+							?>
+						</ul>
+					</div>
 
-			});
+				</div>
 
-		});
+			</div>
 
-	</script>
+		</div>
 
-	<ul class="chapitres">
-	</ul>
+		<footer>
+			<div class="inner">
+				<div class="copyright">
+					powered by Zabriskie <strong>&bull;</strong> Prod | 2013
+				</div>
+			</div>
+		</footer>
+
+	<script type="text/javascript" src="/main.js" />
 
 	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
 
